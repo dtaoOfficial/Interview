@@ -20,7 +20,7 @@ services:
   # ==========================================
   backend:
     # ✅ POINTS TO THE 'resume' FOLDER
-    build: ./IP-Backend/resume
+    build: ./IP-Backend
     container_name: resume_backend
     restart: always
     # ✅ SAFE PORT: External 9091 -> Internal 8080
