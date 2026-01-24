@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # 1. DATABASE (MongoDB)
+  # ==========================================
+  mongo:
+    image: mongo:latest
+    container_name: resume_db
+    restart: always
+    # ✅ PORT CHANGE: External 27099 -> Internal 27017
+    # If you use Compass/Robot3T, connect to: 195.35.6.235:27099
+    ports:
+      - "27099:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # ==========================================
+  # 2. BACKEND (Spring Boot)
+  # ==========================================
+  backend:
+    # ✅ POINTS TO THE 'resume' FOLDER
+    build: ./IP-Backend/resume
+    container_name: resume_backend
+    restart: always
+    # ✅ SAFE PORT: External 9091 -> Internal 8080
+    ports:
+      - "9091:8080"
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      - mongo
+    environment:
+      # ✅ CONNECTION STRING: Still uses 'mongo:27017' (Internal Docker Network is separate)
+      - MONGO_URI=mongodb://mongo:27017/resume_db
+      
+      - PORT=8080
+      - UPLOAD_DIR=/app/uploads
+      
+      # Security Keys
+      - JWT_SECRET=change_this_to_something_secure
+      - JWT_EXPIRATION=3600000
+      
+      # ✅ CORS: Frontend is on 9090
+      - APP_CORS_ALLOWED_ORIGINS=http://localhost:9090,http://195.35.6.235:9090
+      
+      # Email Config
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=465
+      - SMTP_USERNAME=your_email@gmail.com
+      - SMTP_PASSWORD=your_app_password
+      - MAIL_FROM_EMAIL=your_email@gmail.com
+      - MAIL_SENDER_NAME=RecruitAI_HR
+      - HR_EMAIL=hr@example.com
+
+  # ==========================================
+  # 3. FRONTEND (React + Nginx)
+  # ==========================================
+  frontend:
+    # ✅ POINTS TO 'IP-Frontend' ROOT
+    build: ./IP-Frontend
+    container_name: resume_frontend
+    restart: always
+    # ✅ SAFE PORT: External 9090 -> Internal 80
+    ports:
+      - "9090:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
+  uploads_data:

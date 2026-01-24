@@ -1,0 +1,8 @@
+{
+  "name": "RecruitAI - Smart HR Platform",
+  "description": "An AI-powered recruitment platform where candidates apply for roles with video interviews featuring dynamic questions and limited retakes.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
